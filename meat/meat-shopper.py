@@ -3,7 +3,7 @@ from bs4.element import NavigableString
 import urllib2
 import re
 
-GET_GOODS_CODE_REGEX = re.compile(r'\\\'goodsCode\\\'\\\:\\\s\\\'(\\\d*)\\\'')
+GET_GOODS_CODE_REGEX = re.compile(r'goodscode=(\d*)\&')
 
 def get_title(li):
     span = li.find('span', class_='title')
@@ -11,21 +11,30 @@ def get_title(li):
 
 def get_goods_code(li):
     a = li.find('a', attrs={'target': '_blank'})
-    m = GET_GOODS_CODE_REGEX.search(a['onclick'])
-    return m.group(0) if m is not None else None
+    m = GET_GOODS_CODE_REGEX.search(a['href'])
+    return m.group(1) if m is not None else None
 
-req = urllib2.Request(
-    'http://category.gmarket.co.kr/listview/List.aspx?gdmc_cd=200001217')
-req.add_header(
-    'User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36')
-r = urllib2.urlopen(req)
+category_code = '200001217' # meat
+# category_code = '200001054' # refrigerator
 
-soup = BeautifulSoup(r, 'lxml')
-li_list = [li
-           for ul in soup.find_all('ul', class_='item_list type_list')
-           for li in ul.find_all('li')]
 
-products = [(get_title(li), get_goods_code(li)) for li in li_list]
+def crawl(page):
+    req = urllib2.Request(
+        'http://category.gmarket.co.kr/subpage/SearchItemListView.aspx?gdmc_cd={}&page={}&'.format(category_code, page))
+    req.add_header(
+        'User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36')
+    r = urllib2.urlopen(req).read().decode('euc-kr')
 
-for i, pn in enumerate(products):
-    print(str(i) + '. ' + pn[0] + ' --> ' + (pn[1] if pn[1] else 'unknown'))
+    soup = BeautifulSoup(r, 'lxml')
+    li_list = [li
+            for ul in soup.find_all('ul', class_='item_list type_list')
+            for li in ul.find_all('li')]
+
+    for li in li_list:
+        yield (get_title(li), get_goods_code(li))
+
+count = 1
+for page in range(1, 11):
+    for product in crawl(page):
+        print(str(count) + '. ' + product[0] + ' --> ' + product[1])
+        count += 1
