@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Launch
 COPY . .
-CMD [ "python", "./laptop-shopper.py" ]
+CMD [ "python", "./window-shopper.py" ]
