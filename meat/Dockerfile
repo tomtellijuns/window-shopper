@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Launch
 COPY . .
-CMD [ "python", "./window-shopper.py" ]
+CMD [ "python", "./persist.py" ]

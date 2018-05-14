@@ -7,3 +7,11 @@ services:
     build: meat/
     depends_on:
     - db
+  db_admin:
+    image: mongo-express
+    environment:
+    - ME_CONFIG_MONGODB_SERVER=db
+    ports:
+    - 8081
+    depends_on:
+    - db

@@ -33,8 +33,8 @@ def crawl(page):
     for li in li_list:
         yield (get_title(li), get_goods_code(li))
 
-count = 1
-for page in range(1, 11):
-    for product in crawl(page):
-        print(str(count) + '. ' + product[0] + ' --> ' + product[1])
-        count += 1
+# count = 1
+# for page in range(1, 11):
+#     for product in crawl(page):
+#         print(str(count) + '. ' + product[0] + ' --> ' + product[1])
+#         count += 1
